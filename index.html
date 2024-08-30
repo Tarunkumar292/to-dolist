@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            background-color: #f8f9fa;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .sidebar li {
+            list-style-type: none;
+            margin: 15px 0;
+        }
+
+        .list {
+            text-decoration: none;
+            color: white;
+            padding: 15px 20px;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .list:hover {
+            background-color: #0056b3;
+        }
+
+        .main {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <ul class="sidebar p-0">
+                    <li><a class="list bg-primary mb-3" href="#">Dashboard</a></li>
+                    <li><a class="list bg-info mb-3" href="#">Important</a></li>
+                    <li><a class="list bg-warning mb-3" href="#">Planned</a></li>
+                    <li><a class="list bg-danger mb-3" href="#">Assigned to me</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-9 main">
+                <h1 class="text-center mb-4">To-Do List</h1>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="taskInput" placeholder="Enter a task">
+                </div>
+                <div class="input-group mb-3">
+                    <input type="date" class="form-control" id="date" required>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="set-alarm">
+                        <input type="time" name="alarm-time" class="form-control" id="alarmTime" required>
+                    </div>
+                    <button class="btn btn-primary mb-3">Set Alarm</button>
+                </div>
+                <button class="btn btn-primary mb-3" id="addTaskBtn">Add Task</button>
+                <ul class="list-group" id="taskList"></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskList = document.getElementById('taskList');
+        const date = document.getElementById('date');
+        const alarm = document.getElementById('alarmTime');
+
+        taskInput.setAttribute('required', '');
+        date.setAttribute('required', '');
+        alarm.setAttribute('required', '');
+
+        addTaskBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        function addTask() {
+            if (!taskInput.checkValidity()) {
+                taskInput.reportValidity();
+                return;
+            }
+            if (!date.checkValidity()) {
+                date.reportValidity();
+                return;
+            }
+            if (!alarm.checkValidity()) {
+                alarm.reportValidity();
+                return;
+            }
+
+            const taskText = taskInput.value.trim();
+            const taskDate = date.value.trim();
+            const taskAlarm = alarm.value.trim();
+
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.innerHTML = `
+        <span class="task-text">${taskText}</span>
+        <span class="task-date">${taskDate}</span>
+        <span class="task-alarm">${taskAlarm}</span>
+        <div>
+            <button class="btn btn-success btn-sm me-2 complete-btn">Complete</button>
+            <button class="btn btn-primary btn-sm me-2 edit-btn">Edit</button>
+            <button class="btn btn-danger btn-sm delete-btn">Delete</button>
+        </div>
+    `;
+            taskList.appendChild(listItem);
+
+            taskInput.value = '';
+            date.value = '';
+            alarm.value = '';
+
+            const completeBtn = listItem.querySelector('.complete-btn');
+            const editBtn = listItem.querySelector('.edit-btn');
+            const deleteBtn = listItem.querySelector('.delete-btn');
+            const taskSpans = listItem.querySelectorAll('span');
+
+            completeBtn.addEventListener('click', function () {
+                taskSpans.forEach(span => span.classList.toggle('completed'));
+            });
+
+            deleteBtn.addEventListener('click', function () {
+                taskList.removeChild(listItem);
+            });
+
+            editBtn.addEventListener('click', function () {
+                editTask(listItem, taskText, taskDate, taskAlarm);
+            });
+        }
+
+        function editTask(listItem, taskText, taskDate, taskAlarm) {
+            taskInput.value = taskText;
+            date.value = taskDate;
+            alarm.value = taskAlarm;
+
+            taskList.removeChild(listItem);
+
+            taskInput.focus();
+        }
+    </script>
+</body>
+
+</html>
